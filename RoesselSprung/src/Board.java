@@ -1,4 +1,3 @@
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.PriorityQueue;
@@ -10,13 +9,16 @@ public final class Board {
 	private final Logger log = LogManager.getLogger(Board.class);
 	
 	private final int size;
-	private final Field[][] fields;
+	private Field[][] fields;
 	
-	private final static int[][] DISTANCES = {{-2,-2,-1,-1,1,1,2,2},
+	public final static int[][] DISTANCES = {{-2,-2,-1,-1,1,1,2,2},
 											  {-1,1,-2,2,-2,2,-1,1}};
 
 	public Board(final int size) {
 		this.size = size;
+	}
+	
+	private void reset() {
 		fields = new Field[size][size];
 		for (int x = 0; x < fields.length; x++){
 			for (int y = 0; y < fields[x].length; y++) {
@@ -25,7 +27,12 @@ public final class Board {
 		}
 	}
 	
+	public int getSize() {
+		return size;
+	}
+	
 	public Field[] getPath(final int startX, final int startY) {
+		reset();
 		Field[] waypoints = new Field[size*size];
 		if (moveToField(getField(startX, startY), 0, getField(startX, startY), waypoints))
 			return waypoints;
@@ -34,25 +41,32 @@ public final class Board {
 	}
 	
 	private boolean moveToField(final Field field,  final int step, final Field start, final Field[] waypoints) {
-
-		if (field.isVisted())
+		if (field.isVisted()) {
 			return false;
+		}
 		
 		field.setVisted(true);
 		waypoints[step] = field;
 		
 		if (step + 1 >= size*size) {
-			int distX = Math.abs(field.getX() - start.getX());
-			int distY = Math.abs(field.getY() - start.getY());
-			
-			if((distX==2 && distY==1) || (distX==1 && distY==2)) {
-				return true;
-			}
-			else {
-				field.setVisted(false);
-				return false;
-			}
+//			int distX = Math.abs(field.getX() - start.getX());
+//			int distY = Math.abs(field.getY() - start.getY());
+//			
+//			if((distX==2 && distY==1) || (distX==1 && distY==2)) {
+//				return true;
+//			}
+//			else {
+//				field.setVisted(false);
+//				return false;
+//			}
+			return true;
 		}
+		
+//		List<Field> possibleSteps = getPossibleSteps(field);
+		
+//		for (Field possibleStep : possibleSteps) {
+//			possibleStep.decreaseValidSteps();
+//		}
 		
 		PriorityQueue<Field> queue = new PriorityQueue<>(getPossibleSteps(field));
 		
@@ -63,7 +77,11 @@ public final class Board {
 
 			//log.debug("Step " + step + " Tries left:" + queue.size());
 		}
-		
+//		
+//		for (Field possibleStep : possibleSteps) {
+//			possibleStep.increaseValidSteps();
+//		}
+//		
 		field.setVisted(false);
 		return false;
 	}

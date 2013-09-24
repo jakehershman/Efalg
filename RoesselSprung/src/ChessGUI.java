@@ -1,15 +1,19 @@
 import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.Graphics;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 
 import javax.swing.JFrame;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
 
 @SuppressWarnings("serial")
-public class ChessGUI extends JPanel {
+public class ChessGUI extends JPanel implements MouseListener {
 	private int boardSize;
 	private Field[] waypoints;
+	private Board board;
 	
 	public ChessGUI(final int size) {
 		this.boardSize = size;
@@ -18,8 +22,8 @@ public class ChessGUI extends JPanel {
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		frame.add(this);
 		frame.pack();
-		Board board = new Board(size);
-		waypoints = board.getPath(0,0);
+		frame.addMouseListener(this);
+		board = new Board(size);
 		frame.setVisible(true);
 	}
 	
@@ -52,11 +56,13 @@ public class ChessGUI extends JPanel {
 				int y2 = (width/2) + waypoints[i+1].getY()*width;
 				g.drawLine(x1, y1, x2, y2);
 			}
-			int x1 = (width/2) + waypoints[waypoints.length-1].getX()*width;
-			int y1 = (width/2) + waypoints[waypoints.length-1].getY()*width;
-			int x2 = (width/2) + waypoints[0].getX()*width;
-			int y2 = (width/2) + waypoints[0].getY()*width;
-			g.drawLine(x1, y1, x2, y2);
+			
+			g.setColor(Color.GREEN);
+			g.fillOval(
+					(width/3) + waypoints[waypoints.length-1].getX()*width, 
+					(width/3) + waypoints[waypoints.length-1].getY()*width,
+					width/3, width/3);
+			
 		}
 	}
 
@@ -69,6 +75,52 @@ public class ChessGUI extends JPanel {
 	}
 
 	public static void main(String[] args) {
-		new ChessGUI(6);
+		boolean closed = false;
+		int size = 0;
+		while(size <= 0) {
+			
+			String sSize = JOptionPane.showInputDialog("Enter prefered size for chessboard and click startfield:");
+			try {
+				size = Integer.parseInt(sSize);
+				
+			} catch (NumberFormatException e) {
+				
+		    }
+		}
+		new ChessGUI(size);
+		
+	}
+
+	@Override
+	public void mouseClicked(MouseEvent arg0) {
+		int width = 800 / boardSize;
+		int x = arg0.getX() / width;
+		int y = arg0.getY() / width;
+		waypoints = board.getPath(x,y);
+		repaint();
+	}
+
+	@Override
+	public void mouseEntered(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseExited(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mousePressed(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
+	}
+
+	@Override
+	public void mouseReleased(MouseEvent arg0) {
+		// TODO Auto-generated method stub
+		
 	}
 }

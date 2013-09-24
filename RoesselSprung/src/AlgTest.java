@@ -1,19 +1,19 @@
 
 public class AlgTest {
-	static boolean[][] spielfeld = new boolean[6][6];
-	static int[][] steps = new int[36][2];
-	static int N = 6;
+	static int N = 8;
+	static boolean[][] spielfeld = new boolean[N][N];
+	static int[][] steps = new int[N*N][2];
 
 	public static void main(String[] args) {
-		Board board = new Board(6);
+		Board board = new Board(N);
 		
 		long start = System.currentTimeMillis();
-		Field[] path =  board.getPath(0,0);
+		Field[] path =  board.getPath(3,3);
 		System.out.println("New: " + (System.currentTimeMillis() - start) + " ms");
 		
-		start = System.currentTimeMillis();
-		springer(0,0,0,true);
-		System.out.println("Old: " + (System.currentTimeMillis() - start) + " ms");
+//		start = System.currentTimeMillis();
+//		springer(1,2,0,false);
+//		System.out.println("Old: " + (System.currentTimeMillis() - start) + " ms");
 	}
 	
 	private static boolean springer(int x, int y, int step, boolean closed) {
