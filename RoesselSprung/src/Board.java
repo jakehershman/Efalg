@@ -1,109 +1,146 @@
-import java.util.LinkedList;
-import java.util.List;
 import java.util.PriorityQueue;
 
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
-
-public final class Board {
-	private final Logger log = LogManager.getLogger(Board.class);
+/**
+ * @author Daniel Guerber
+ * Represents a board of a given size, on which a Knight's Path 
+ * from a specified can be calculated.
+ */
+public class Board {
 	
+	/**
+	 * Stores the size of the board.
+	 */
 	private final int size;
-	private Field[][] fields;
 	
+	/**
+	 * Stores if the field at the [x][y] coordinate has been visited.
+	 */
+	private boolean[][] fields;
+	
+	/**
+	 * Stores the number of unvisited neighbors for the field at [x][y].
+	 */
+	private int[][] neighbors;
+	
+	/**
+	 * Stores the valid move distance of the knight in the 
+	 * [0][n] for x and [1][n] for y field for the move n (0 to 7).
+	 */
 	public final static int[][] DISTANCES = {{-2,-2,-1,-1,1,1,2,2},
-											  {-1,1,-2,2,-2,2,-1,1}};
-
+		  									 {-1,1,-2,2,-2,2,-1,1}};
+	
+	/**
+	 * Creates a Board with the given size.
+	 * @param size size of the Board
+	 */
 	public Board(final int size) {
 		this.size = size;
-		reset();
 	}
 	
-	private void reset() {
-		fields = new Field[size][size];
-		for (int x = 0; x < fields.length; x++){
-			for (int y = 0; y < fields[x].length; y++) {
-				fields[x][y] = new Field(this, x, y);
+	/**
+	 * Initializes the number of neighbors for each field to the start value.
+	 */
+	private void initializeNeighbors() {
+		for (int x = 0; x < neighbors.length; x++) {
+			for (int y = 0; y < neighbors[x].length; y++) {
+				int possibleSteps=0;
+				
+				//Check which of the moves is valid for this field.
+				for (int i = 0; i < DISTANCES[0].length; i++) {
+					int newX = x + DISTANCES[0][i];
+					int newY = y + DISTANCES[1][i];
+					if (newX >= 0 && newX < size && newY >= 0 && newY < size)
+						possibleSteps++;
+				}
+				
+				neighbors[x][y] = possibleSteps;
 			}
 		}
 	}
 	
-	public int getSize() {
-		return size;
+	/**
+	 * Resets the board to calculate a new path.
+	 */
+	private void reset() {
+		fields = new boolean[size][size];
+		neighbors = new int[size][size];
+		initializeNeighbors();
 	}
 	
+	/**
+	 * Calculates a path from the given start field and
+	 * returns the visited fields in the order of the visit.
+	 * @param startX X-Coordinate of the Field (starting at 0)
+	 * @param startY Y-Coordinate of the Field (starting at 0)
+	 * @return Field array containing all visited fields in the order
+	 * of the visits,
+	 * null if no path exists.
+	 */
 	public Field[] getPath(final int startX, final int startY) {
+		//Checking start field
+		if (startX < 0 || startX >= size || startY < 0 || startY >= size)
+			throw new IllegalArgumentException("Specified field not valid for board size!");
 		reset();
 		Field[] waypoints = new Field[size*size];
-		if (moveToField(getField(startX, startY), 0, getField(startX, startY), waypoints))
+		if (moveToField(new Field(startX, startY), 0, waypoints))
 			return waypoints;
 		else
 			return null;
 	}
 	
-	private boolean moveToField(final Field field,  final int step, final Field start, final Field[] waypoints) {
-		if (field.isVisted()) {
-			return false;
-		}
+	/**
+	 * Marks field as visited, updates waypoints and tries to find next valid moves.
+	 * @param field Field to move to
+	 * @param step Number of previously done steps
+	 * @param waypoints Previously visited waypoints
+	 * @return true if path found, false if no possible path
+	 */
+	private boolean moveToField(Field field,  final int step, final Field[] waypoints) {
 		
-		field.setVisted(true);
+		//Mark field as visited and update waypoints.
+		fields[field.getX()][field.getY()] = true;
 		waypoints[step] = field;
 		
 		if (step + 1 >= size*size) {
-//			int distX = Math.abs(field.getX() - start.getX());
-//			int distY = Math.abs(field.getY() - start.getY());
-//			
-//			if((distX==2 && distY==1) || (distX==1 && distY==2)) {
-//				return true;
-//			}
-//			else {
-//				field.setVisted(false);
-//				return false;
-//			}
+			//last step reached, path is complete.
 			return true;
 		}
 		
-//		List<Field> possibleSteps = getPossibleSteps(field);
 		
-//		for (Field possibleStep : possibleSteps) {
-//			possibleStep.decreaseValidSteps();
-//		}
+		PriorityQueue<Field> queue = new PriorityQueue<Field>();
 		
-		PriorityQueue<Field> queue = new PriorityQueue<>(getPossibleSteps(field));
+		//Update number of neighbors on all neighbors and ad neighbors to priority queue
+		for (int i = 0; i < DISTANCES[0].length; i++) {
+			int newX = field.getX() + DISTANCES[0][i];
+			int newY = field.getY() + DISTANCES[1][i];
+			if (newX >= 0 && newX < size && newY >= 0 && newY < size) {
+				neighbors[newX][newY]--;
+				//Only add neighbor if not visited before.
+				if (!fields[newX][newY])
+					queue.add(new Field(neighbors[newX][newY], newX,newY));
+			}
+		}
 		
+		//Try each neighbor, begining with the one with the least number of neighbors.
 		Field nextStep;
 		while ((nextStep = queue.poll()) != null) {
-			if (moveToField(nextStep, step + 1, start, waypoints))
+			if (moveToField(nextStep, step + 1, waypoints))
 				return true;
-
-			//log.debug("Step " + step + " Tries left:" + queue.size());
+		}	
+		
+		//No valid path from this field, reset visited and update neighbors.
+		
+		fields[field.getX()][field.getY()] = false;
+		
+		for (int i = 0; i < DISTANCES[0].length; i++) {
+			int newX = field.getX() + DISTANCES[0][i];
+			int newY = field.getY() + DISTANCES[1][i];
+			if (newX >= 0 && newX < size && newY >= 0 && newY < size) {
+				neighbors[newX][newY]++;
+			}
 		}
-//		
-//		for (Field possibleStep : possibleSteps) {
-//			possibleStep.increaseValidSteps();
-//		}
-//		
-		field.setVisted(false);
+		
 		return false;
 	}
 	
-	public Field getField(int x, int y) {
-		if (x < size && x >= 0 && y < size && y >= 0)
-			return fields[x][y];
-		else
-			return null;
-	}
-	
-	public List<Field> getPossibleSteps(Field field) {
-		LinkedList<Field> steps = new LinkedList<Field>();
-		
-		for (int i = 0; i < DISTANCES[0].length; i++) {
-			Field step = getField(field.getX() + DISTANCES[0][i], 
-								  field.getY() + DISTANCES[1][i]);
-			if (step != null && !step.isVisted())
-				steps.add(step);
-		}
-		
-		return steps;
-	}
 }

@@ -8,13 +8,36 @@ import javax.swing.JFrame;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 
-
-@SuppressWarnings("serial")
+/**
+ * @author Daniel Guerber
+ * Displays a GUI to visualize a Knight's Path.
+ */
 public class ChessGUI extends JPanel implements MouseListener {
-	private int boardSize;
-	private Position[] waypoints;
-	private RoesselSprung rs;
 	
+	/**
+	 * UUID for serializing
+	 */
+	private static final long serialVersionUID = -3135524775798140507L;
+	
+	/**
+	 * Size of the board
+	 */
+	private int boardSize;
+	
+	/**
+	 * Waypoints of the found path
+	 */
+	private Field[] waypoints;
+	
+	/**
+	 * Reference to the used board.
+	 */
+	private Board board;
+	
+	/**
+	 * Creates a GUI for a board with the specified size.
+	 * @param size size of the board
+	 */
 	public ChessGUI(final int size) {
 		this.boardSize = size;
 		this.setPreferredSize(new Dimension(800, 800));
@@ -23,13 +46,19 @@ public class ChessGUI extends JPanel implements MouseListener {
 		frame.add(this);
 		frame.pack();
 		frame.addMouseListener(this);
-		rs = new RoesselSprung(size);
+		board = new Board(size);
 		frame.setVisible(true);
+		frame.setResizable(false);
 	}
 	
+	/**
+	 * Paints the chess board and the path.
+	 */
 	@Override
 	public void paint(Graphics g) {
 		super.paint(g);
+		
+		//paint chess board
 		int width = 800 / boardSize;
 		for (int x = 0; x < boardSize; x++) {
 			for (int y = 0; y < boardSize; y++) {
@@ -43,6 +72,7 @@ public class ChessGUI extends JPanel implements MouseListener {
 			}
 		}
 		
+		//Paint path if one is present
 		if (waypoints != null && waypoints.length > 0) {
 			g.setColor(Color.RED);
 			g.fillOval(
@@ -66,18 +96,13 @@ public class ChessGUI extends JPanel implements MouseListener {
 		}
 	}
 
-	public int getBoardSize() {
-		return boardSize;
-	}
-
-	public void setBoardSize(int size) {
-		this.boardSize = size;
-	}
-
+	/**
+	 * Asks for a preferred board size and displays it.
+	 * @param args
+	 */
 	public static void main(String[] args) {
 		int size = 0;
 		while(size <= 0) {
-			
 			String sSize = JOptionPane.showInputDialog("Enter prefered size for chessboard and click startfield:");
 			try {
 				size = Integer.parseInt(sSize);
@@ -87,39 +112,42 @@ public class ChessGUI extends JPanel implements MouseListener {
 		    }
 		}
 		new ChessGUI(size);
-		
 	}
 
+	/**
+	 * Calculates a path with the clicked position.
+	 */
 	@Override
 	public void mouseClicked(MouseEvent arg0) {
 		int width = 800 / boardSize;
 		int x = arg0.getX() / width;
 		int y = arg0.getY() / width;
-		waypoints = rs.getPath(x,y);
-		repaint();
+		waypoints = board.getPath(x,y);
+		if (waypoints!= null)
+			repaint();
+		else
+			JOptionPane.showMessageDialog(this, "No Path found!");
 	}
 
 	@Override
 	public void mouseEntered(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
+		// Not used for logic
 	}
 
 	@Override
 	public void mouseExited(MouseEvent arg0) {
-		// TODO Auto-generated method stub
+		// Not used for logic
 		
 	}
 
 	@Override
 	public void mousePressed(MouseEvent arg0) {
-		// TODO Auto-generated method stub
+		// Not used for logic
 		
 	}
 
 	@Override
 	public void mouseReleased(MouseEvent arg0) {
-		// TODO Auto-generated method stub
-		
+		// Not used for logic
 	}
 }

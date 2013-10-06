@@ -1,55 +1,73 @@
 
-public final class Field implements Comparable<Field>{
-	private final int x;
-	private final int y;
-	private boolean isVisted = false;
-	private final Board board;
-//	private int validSteps;
+/**
+ * @author Daniel Guerber
+ * This class is used to store a fields position and number of neighbors.
+ */
+public class Field implements Comparable<Field> {
 	
-	public Field(Board board, int x, int y) {
-		this.board = board;
+	/**
+	 * Coordinates of the field
+	 */
+	private final int x,y;
+	
+	/**
+	 * Number of neighbors of the field
+	 */
+	private int neighbors;
+	
+	/**
+	 * Creates a new field with the specified number of neighbors and position.
+	 * @param neighbors Number of valid neighbors
+	 * @param x X-Coordinate of the field
+	 * @param y Y-Coordinate of the field
+	 */
+	public Field(int neighbors, int  x, int y) {
+		this(x,y);
+		this.neighbors = neighbors;
+	}
+
+	/**
+	 * Creates a new field with the specified number position.
+	 * @param x X-Coordinate of the field
+	 * @param y Y-Coordinate of the field
+	 */
+	public Field(int x, int y) {
 		this.x = x;
 		this.y = y;
-//		for (int i = 0; i < Board.DISTANCES[0].length; i++) {
-//			int xDist = x + Board.DISTANCES[0][i];
-//			int yDist = y + Board.DISTANCES[1][i];
-//			if (xDist >= 0 && xDist < board.getSize() && yDist >= 0 && yDist < board.getSize())
-//				validSteps++;
-//		}
+		//Neighbors don't matter if this constructor is used.
+		neighbors=0;
 	}
-	
-//	public void increaseValidSteps(){
-//		validSteps++;
-//	}
-//	
-//	public void decreaseValidSteps(){
-//		validSteps++;
-//	}
-//
-//	public int getValidSteps() {
-//		return validSteps;
-//	}
-	
+
+	/**
+	 * @return X-Coordinate of the field.
+	 */
 	public int getX() {
 		return x;
 	}
 
+	/**
+	 * @return Y-Coordinate of the field.
+	 */
 	public int getY() {
 		return y;
 	}
 	
-	public boolean isVisted() {
-		return isVisted;
+	/**
+	 * @return Number of valid neighbors of the field.
+	 */
+	public int getNeighbors() {
+		return neighbors;
 	}
-
-	public void setVisted(boolean isVisted) {
-		this.isVisted = isVisted;
-	}
-
+	
+	/**
+	 * Compares two fields and returns:
+	 *  < 0 if this field has less neighbors
+	 *  0 if number of neighbors is equal
+	 *  > 0 if this field has more neighbors 
+	 */
 	@Override
-	public int compareTo(Field field) {
-		return board.getPossibleSteps(this).size() 
-				- board.getPossibleSteps(field).size();
-//		return validSteps - field.getValidSteps();
+	public int compareTo(Field pos) {
+		return this.getNeighbors()-pos.getNeighbors();
 	}
+	
 }
