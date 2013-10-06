@@ -12,8 +12,8 @@ import javax.swing.JPanel;
 @SuppressWarnings("serial")
 public class ChessGUI extends JPanel implements MouseListener {
 	private int boardSize;
-	private Field[] waypoints;
-	private Board board;
+	private Position[] waypoints;
+	private RoesselSprung rs;
 	
 	public ChessGUI(final int size) {
 		this.boardSize = size;
@@ -23,7 +23,7 @@ public class ChessGUI extends JPanel implements MouseListener {
 		frame.add(this);
 		frame.pack();
 		frame.addMouseListener(this);
-		board = new Board(size);
+		rs = new RoesselSprung(size);
 		frame.setVisible(true);
 	}
 	
@@ -75,7 +75,6 @@ public class ChessGUI extends JPanel implements MouseListener {
 	}
 
 	public static void main(String[] args) {
-		boolean closed = false;
 		int size = 0;
 		while(size <= 0) {
 			
@@ -96,7 +95,7 @@ public class ChessGUI extends JPanel implements MouseListener {
 		int width = 800 / boardSize;
 		int x = arg0.getX() / width;
 		int y = arg0.getY() / width;
-		waypoints = board.getPath(x,y);
+		waypoints = rs.getPath(x,y);
 		repaint();
 	}
 

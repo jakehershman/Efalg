@@ -16,6 +16,7 @@ public final class Board {
 
 	public Board(final int size) {
 		this.size = size;
+		reset();
 	}
 	
 	private void reset() {

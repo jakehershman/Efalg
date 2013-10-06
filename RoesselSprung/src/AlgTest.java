@@ -1,19 +1,56 @@
 
+
+
 public class AlgTest {
-	static int N = 8;
+	static int N = 16;
+	static int X=4;
+	static int Y=4;
 	static boolean[][] spielfeld = new boolean[N][N];
 	static int[][] steps = new int[N*N][2];
 
 	public static void main(String[] args) {
+		
+		
+		
+		long timeObj = 0;
+		long timeAlg = 0;
+		
 		Board board = new Board(N);
+		RoesselSprung rs = new RoesselSprung(N);
 		
-		long start = System.currentTimeMillis();
-		Field[] path =  board.getPath(3,3);
-		System.out.println("New: " + (System.currentTimeMillis() - start) + " ms");
+		for (int x = 0; x < N; x++) {
+			for (int y = 0; y < N; y++) {
+				long start = System.currentTimeMillis();
+				
+				Field[] path =  board.getPath(x,y);
+				timeObj += (System.currentTimeMillis() - start);
+				
+				start = System.currentTimeMillis();
+				
+				Position[] path2 = rs.getPath(x,y);
+				timeAlg += (System.currentTimeMillis() - start);
+				
+				if (path==null)
+					System.err.println("Object failed!");
+				if (path2==null)
+					System.err.println("Algo failed!");
+			}
+		}
 		
-//		start = System.currentTimeMillis();
-//		springer(1,2,0,false);
-//		System.out.println("Old: " + (System.currentTimeMillis() - start) + " ms");
+		System.out.println("Object: " + timeObj + " ms");
+		System.out.println("Algorithm: " +timeAlg + " ms");
+		
+//		if (path!=null && path2!=null) {
+//			for (int i = 0; i < path.length; i++) {
+//				if (!path2[i].equalsField(path[i])) {
+//					System.err.println("Mismatch at " + i);
+//					System.err.println("Field1 x:" + path[i].getX() + " y:" + path[i].getY());
+//					System.err.println("Field2 x:" + path2[i].getX() + " y:" + path2[i].getY());
+//				}
+//			}
+//		} else if (path!=null || path2 != null ) {
+//			System.err.println("result mismatch");
+//		}
 	}
 	
 	private static boolean springer(int x, int y, int step, boolean closed) {
