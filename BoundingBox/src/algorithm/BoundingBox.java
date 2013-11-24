@@ -26,8 +26,8 @@ public class BoundingBox {
 				
 				double minX = Double.MAX_VALUE;
 				double minY = Double.MAX_VALUE;
-				double maxX = Double.MIN_VALUE;
-				double maxY = Double.MIN_VALUE;
+				double maxX = -Double.MAX_VALUE;
+				double maxY = -Double.MAX_VALUE;
 				for (Point point : rotatedHull) {
 					minX = Math.min(point.x, minX);
 					minY = Math.min(point.y, minY);
